@@ -111,40 +111,6 @@ node['opsworks']['instance']['layers'].each do |layer|
 end 
 
 
-# nodes = search(
-#       :node,
-#       "mongodb_cluster_name:#{node['mongodb']['cluster_name']} AND \
-#        mongodb_is_replicaset:true AND \
-#        mongodb_shard_name:#{node['mongodb']['shard_name']} AND \
-#        chef_environment:_default"
-#     )
-nodes = search(
-      node[:mongodb][:collection_name],
-      "mongodb_cluster_name:#{node[:mongodb][:cluster_name]} AND \
-       mongodb_is_shard:true AND \
-       chef_environment:#{node.chef_environment}"
-)
-
-nodes.each_index do |n|
-Chef::Log.info("Node is #{n}")
-Chef::Log.info("Node attr JSON is #{nodes[n].attributes.to_hash.to_json}")
-end
-
-Chef::Log.warn("We should have logged stuff before this")
-
-
-allnodes = search(:node, "*:*")
-Chef::Log.info("Big node list is #{allnodes}")
-
-Chef::Log.info("Attributes available to be overridden: #{node['mongodb-opsworks']['instance_overrides']}")
-Chef::Log.info("Node to be overridden: #{node['opsworks']['instance']['hostname']}")
-node_overrides = node['mongodb-opsworks']['instance_overrides'][node['opsworks']['instance']['hostname']]
-Chef::Log.info("Decision point!: #{node_overrides}")
-
-if node_overrides
-		Chef::Log.info("Merging node bases!")
-		node.normal_attrs = Chef::Mixin::DeepMerge.merge(node.normal_attrs,node_overrides)
-end
 
 Chef::Log.info("After Node Overrides: #{node.to_json}")
 
